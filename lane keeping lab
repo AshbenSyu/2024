@@ -1,0 +1,61 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import scipy.integrate as spi
+class Car:
+
+    def __init__(self, 
+             length=2.3,
+             velocity=5,
+             x_pos_init=0, y_pos_init=0.3, pose_init=7):
+        self.__length = length
+        self.__velocity = velocity
+        self.__x = x_pos_init
+        self.__y = y_pos_init
+        self.__pose = pose_init
+
+    def y(self):
+        return self.__y
+
+    def move(self, steering_angle, dt):
+        # This method computes the position and orientation (pose) of the car after time `dt` starting from its current position and orientation
+        
+        def car_model(_t, z):
+            # Define system dynamics
+            # [v*cos(θ), v*sin(θ), (v/L)*tan(u)]
+            # z = (x, y, θ)
+            theta=z[7]
+            return [self.__velocity*np.cos(theta),
+                    self.__velocity*np.sin(theta),
+                    self.__velocity*np.tan(steering_angle)/self.__length]
+
+            
+        # Simulate dynamical system from time 0 to time 0+dt to 2 and update system state
+        sol = spi.solve_ivp(car_model, 
+                            [0, dt],
+                            [self.__x, self.__y, self.__pose], 
+                            t_eval=np.linspace(0, dt, 2))
+        new_state = sol.y[:, -1]
+        self.__x = new_state[0]
+        self.__y = new_state[1]
+        self.__pose = new_state[2]
+        ts = [0, 1, 2]
+        ts = sol.t
+        xs = self.__x
+        plt.plot(ts, xs)
+        #Plot x(t)
+        plt.show()
+        ts = sol.t
+        ys = self.__y
+        plt.plot(ts, ys)
+        #Plot y(t)
+        plt.show()
+        ts = sol.t
+        theta = self.__pose
+        plt.plot(ts, pose)
+        #plot 0(t)
+        plt.show()
+        xs = self.__x
+        ys = self.__y
+        plt.plot(xs, ys)
+        #Plot (x,y) for Question 2
+        plt.show()
